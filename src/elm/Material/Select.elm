@@ -17,12 +17,19 @@ import Material.Attributes as HtmlA
 view : Model id msg -> List (ItemModel id msg) -> Html msg
 view model items =
     let
+        fullWidth =
+            if model.fullWidth then
+                [ HtmlA.fullWidth ]
+
+            else
+                []
+
         allAttrs =
             [ model.label |> HtmlA.label
             , model.idFromString >> model.wrap |> onChange
-            , HtmlA.fullWidth
             , HtmlA.disabled model.disabled
             ]
+                ++ fullWidth
     in
     Html.node "mwc-select" allAttrs (items |> List.map (viewItem model))
 
@@ -36,6 +43,7 @@ type alias Model id msg =
     , selected : Maybe id
     , wrap : Maybe id -> msg
     , disabled : Bool
+    , fullWidth : Bool
     }
 
 
