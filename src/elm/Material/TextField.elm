@@ -1,6 +1,7 @@
 module Material.TextField exposing
     ( Type(..)
     , view
+    , viewWithAttrs
     , viewWithFocus
     , viewWithReturn
     )
@@ -55,10 +56,6 @@ viewWithReturn label t value action onReturn noOp =
     viewWithAttrs label t value action [ HtmlE.keyCode |> Json.map onKeyPress |> HtmlE.on "keydown" ]
 
 
-
-{- Private -}
-
-
 viewWithAttrs : String -> Type -> String -> Maybe (String -> msg) -> List (Html.Attribute msg) -> Html msg
 viewWithAttrs label t value action attrs =
     let
@@ -78,6 +75,10 @@ viewWithAttrs label t value action attrs =
             ]
     in
     Html.node "mwc-textfield" (allAttrs ++ attrs) []
+
+
+
+{- Private -}
 
 
 type_ : Type -> Html.Attribute msg
