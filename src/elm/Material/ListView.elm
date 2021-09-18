@@ -58,7 +58,7 @@ viewItem : Action msg -> Maybe (Html msg) -> Maybe (List (Html msg)) -> Maybe (L
 viewItem action_ icon secondary meta children =
     let
         ( optionalAttrs, optionalSlots ) =
-            [ icon |> Maybe.map (\i -> ( HtmlA.attribute "graphic" "large", Html.span [ HtmlA.slot "graphic" ] i ))
+            [ icon |> Maybe.map (\i -> ( HtmlA.attribute "graphic" "large", Html.span [ HtmlA.slot "graphic" ] [ i ] ))
             , meta |> Maybe.map (\m -> ( True |> Json.bool |> HtmlA.property "hasMeta", Html.span [ HtmlA.slot "meta" ] m ))
             , secondary |> Maybe.map (\s -> ( True |> Json.bool |> HtmlA.property "twoline", Html.span [ HtmlA.slot "secondary" ] s ))
             ]

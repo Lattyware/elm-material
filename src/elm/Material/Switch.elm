@@ -18,7 +18,7 @@ view label checked action =
                     ( HtmlA.disabled True, [] )
     in
     Html.label labelAttrs
-        [ Html.node "mwc-switch" [ HtmlA.checked checked, switchAttr ] []
+        [ Html.node "mwc-switch" [ HtmlA.selected checked, switchAttr ] []
         , label
         ]
 

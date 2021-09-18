@@ -6,7 +6,6 @@ module Material.Attributes exposing
 
 import Html
 import Html.Attributes as HtmlA
-import Json.Encode as Json
 
 
 label : String -> Html.Attribute msg

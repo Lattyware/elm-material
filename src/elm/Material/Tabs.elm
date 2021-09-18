@@ -47,12 +47,12 @@ view { selected, change, ids, tab, equals } =
                 ( iconAttr, iconNode ) =
                     case icon of
                         Just i ->
-                            ( [ hasImageIcon ], [ Html.span [ HtmlA.slot "icon" ] i ] )
+                            ( [ hasImageIcon ], [ Html.span [ HtmlA.slot "icon" ] [ i ] ] )
 
                         Nothing ->
                             ( [], [] )
             in
-            Html.node "mwc-tab" (label :: iconAttr) iconNode
+            Html.node "mwc-tab" iconAttr (Html.span [ HtmlA.slot "label" ] [ label ] :: iconNode)
 
         tabs =
             ids |> List.map (tab >> viewTab)
