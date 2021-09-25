@@ -6,7 +6,7 @@
   "author": "",
   "license": "AGPL-3.0-or-later",
   "dependencies": {
-    "@material/card": "^12.0.0",
+    "@material/card": "^13.0.0",
     "@material/mwc-button": "^0.25.1",
     "@material/mwc-fab": "^0.25.1",
     "@material/mwc-icon-button": "^0.25.1",
