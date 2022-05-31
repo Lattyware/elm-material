@@ -44,6 +44,7 @@ type alias Model id msg =
     , wrap : Maybe id -> msg
     , disabled : Bool
     , fullWidth : Bool
+    , attrs : List (Html.Attribute msg)
     }
 
 

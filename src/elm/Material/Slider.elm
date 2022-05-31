@@ -16,6 +16,7 @@ type alias Model msg =
     , step : Int
     , value : Int
     , onChange : Maybe (Int -> msg)
+    , attrs : List (Html.Attribute msg)
     }
 
 
@@ -29,8 +30,19 @@ view model =
 
                 Nothing ->
                     HtmlA.disabled True
+
+        attrs =
+            [ min model.min
+            , max model.max
+            , step model.step
+            , value model.value
+            , markers
+            , pin
+            , action
+            ]
+                ++ model.attrs
     in
-    Html.node "mwc-slider" [ min model.min, max model.max, step model.step, value model.value, markers, pin, action ] []
+    Html.node "mwc-slider" attrs []
 
 
 step : Int -> Html.Attribute msg

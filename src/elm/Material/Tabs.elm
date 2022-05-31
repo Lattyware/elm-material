@@ -21,13 +21,14 @@ type alias Model id msg =
     , ids : List id
     , tab : id -> TabModel msg
     , equals : id -> id -> Bool
+    , stacked : Bool
     }
 
 
 {-| A model for a tab.
 -}
 type alias TabModel msg =
-    { label : Html msg
+    { label : String
     , icon : Maybe (Html msg)
     }
 
@@ -35,8 +36,15 @@ type alias TabModel msg =
 {-| View a bar of tabs.
 -}
 view : Model id msg -> Html msg
-view { selected, change, ids, tab, equals } =
+view { selected, change, ids, tab, equals, stacked } =
     let
+        stackedAttr =
+            if stacked then
+                [ stackedA ]
+
+            else
+                []
+
         attrs =
             [ ids |> List.findIndex (equals selected) |> Maybe.withDefault 0 |> activeIndex
             , ((\id -> List.getAt id ids) >> change) |> onActivated
@@ -51,8 +59,15 @@ view { selected, change, ids, tab, equals } =
 
                         Nothing ->
                             ( [], [] )
+
+                tabAttrs =
+                    List.concat
+                        [ [ HtmlA.label label ]
+                        , iconAttr
+                        , stackedAttr
+                        ]
             in
-            Html.node "mwc-tab" iconAttr (Html.span [ HtmlA.slot "label" ] [ label ] :: iconNode)
+            Html.node "mwc-tab" tabAttrs iconNode
 
         tabs =
             ids |> List.map (tab >> viewTab)
@@ -62,6 +77,11 @@ view { selected, change, ids, tab, equals } =
 
 
 {- Private -}
+
+
+stackedA : Html.Attribute msg
+stackedA =
+    HtmlA.attribute "stacked" ""
 
 
 activeIndex : Int -> Html.Attribute msg

@@ -24,9 +24,8 @@ view attributes children =
 -}
 type Action msg
     = None
-    | Link
-    | Enabled msg
-    | Disabled
+    | Link (Html msg -> Html msg)
+    | Button (Maybe msg)
 
 
 {-| A list item that is only sometimes enabled.
@@ -34,22 +33,17 @@ type Action msg
 interactive : msg -> Bool -> Action msg
 interactive msg enabled =
     if enabled then
-        Enabled msg
+        msg |> Just |> Button
 
     else
-        Disabled
+        Nothing |> Button
 
 
 {-| An action from a maybe, if it is enabled.
 -}
 action : Maybe msg -> Action msg
-action a =
-    case a of
-        Just msg ->
-            Enabled msg
-
-        Nothing ->
-            Disabled
+action =
+    Button
 
 
 {-| An item within a list.
@@ -58,26 +52,26 @@ viewItem : Action msg -> Maybe (Html msg) -> Maybe (List (Html msg)) -> Maybe (L
 viewItem action_ icon secondary meta children =
     let
         ( optionalAttrs, optionalSlots ) =
-            [ icon |> Maybe.map (\i -> ( HtmlA.attribute "graphic" "large", Html.span [ HtmlA.slot "graphic" ] [ i ] ))
+            [ icon |> Maybe.map (\i -> ( HtmlA.attribute "graphic" "medium", Html.span [ HtmlA.slot "graphic" ] [ i ] ))
             , meta |> Maybe.map (\m -> ( True |> Json.bool |> HtmlA.property "hasMeta", Html.span [ HtmlA.slot "meta" ] m ))
             , secondary |> Maybe.map (\s -> ( True |> Json.bool |> HtmlA.property "twoline", Html.span [ HtmlA.slot "secondary" ] s ))
             ]
                 |> List.filterMap identity
                 |> List.unzip
 
-        actionAttr =
+        ( parent, actionAttr ) =
             case action_ of
-                Enabled msg ->
-                    [ msg |> HtmlE.onClick ]
+                Button (Just msg) ->
+                    ( identity, [ msg |> HtmlE.onClick ] )
 
-                Disabled ->
-                    [ HtmlA.disabled True ]
+                Button Nothing ->
+                    ( identity, [ HtmlA.disabled True ] )
 
-                Link ->
-                    []
+                Link a ->
+                    ( a, [] )
 
                 None ->
-                    [ True |> Json.bool |> HtmlA.property "noninteractive" ]
+                    ( identity, [ True |> Json.bool |> HtmlA.property "noninteractive" ] )
 
         attrs =
             List.concat [ optionalAttrs, actionAttr ]
@@ -85,4 +79,4 @@ viewItem action_ icon secondary meta children =
         slots =
             List.concat [ optionalSlots, [ Html.span [] children ] ]
     in
-    Html.node "mwc-list-item" attrs slots
+    Html.node "mwc-list-item" attrs slots |> parent

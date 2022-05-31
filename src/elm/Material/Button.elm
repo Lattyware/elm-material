@@ -2,6 +2,7 @@ module Material.Button exposing
     ( Density(..)
     , Type(..)
     , view
+    , viewWithAttrs
     )
 
 import Html exposing (Html)
@@ -24,6 +25,11 @@ type Type
 
 view : Type -> Density -> String -> Maybe (Html msg) -> Maybe msg -> Html msg
 view type_ density label icon action =
+    viewWithAttrs type_ density label icon action []
+
+
+viewWithAttrs : Type -> Density -> String -> Maybe (Html msg) -> Maybe msg -> List (Html.Attribute msg) -> Html msg
+viewWithAttrs type_ density label icon action extraAttrs =
     let
         typeAttr =
             case type_ of
@@ -63,6 +69,7 @@ view type_ density label icon action =
                   ]
                 , typeAttr
                 , densityAttr
+                , extraAttrs
                 ]
 
         iconSlot i =

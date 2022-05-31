@@ -1,4 +1,8 @@
-module Material.Menu exposing (view)
+module Material.Menu exposing
+    ( Corner(..)
+    , State(..)
+    , view
+    )
 
 import Html exposing (Html)
 import Html.Attributes as HtmlA
