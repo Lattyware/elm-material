@@ -11,25 +11,20 @@ import Material.Attributes as HtmlA
 
 type Type
     = Normal
-    | Extended
+    | Extended String
     | Mini
 
 
 view : Type -> String -> Html msg -> Maybe msg -> List (Html.Attribute msg) -> Html msg
 view type_ title icon action attrs =
     let
-        content =
-            case type_ of
-                Extended ->
-                    [ title |> Html.text ]
-
-                _ ->
-                    []
-
         style =
             case type_ of
                 Mini ->
                     [ HtmlA.attribute "mini" "" ]
+
+                Extended text ->
+                    [ text |> HtmlA.label, HtmlA.attribute "extended" "" ]
 
                 _ ->
                     []
@@ -44,4 +39,4 @@ view type_ title icon action attrs =
     in
     Html.node "mwc-fab"
         (List.concat [ [ title |> HtmlA.title, onClick ], style, attrs ])
-        (Html.span [ HtmlA.slot "icon" ] [ icon ] :: content)
+        [ Html.span [ HtmlA.slot "icon" ] [ icon ] ]
