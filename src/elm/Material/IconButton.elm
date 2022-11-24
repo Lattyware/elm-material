@@ -32,7 +32,12 @@ viewInternal onClick icon title action =
                 Nothing ->
                     HtmlA.disabled True
     in
-    Html.node "mwc-icon-button" [ title |> HtmlA.title, actionAttr ] [ icon ]
+    Html.node "mwc-icon-button"
+        [ title |> HtmlA.title
+        , title |> HtmlA.attribute "aria-label"
+        , actionAttr
+        ]
+        [ icon ]
 
 
 onClickNoPropagation : msg -> Html.Attribute msg
