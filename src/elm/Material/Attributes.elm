@@ -1,6 +1,7 @@
 module Material.Attributes exposing
     ( fullWidth
     , label
+    , outlined
     , slot
     )
 
@@ -21,3 +22,8 @@ slot =
 fullWidth : Html.Attribute msg
 fullWidth =
     HtmlA.attribute "fullwidth" ""
+
+
+outlined : Html.Attribute msg
+outlined =
+    HtmlA.attribute "outlined" ""

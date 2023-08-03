@@ -25,11 +25,14 @@ view model items =
                 []
 
         allAttrs =
-            [ model.label |> HtmlA.label
-            , model.idFromString >> model.wrap |> onChange
-            , HtmlA.disabled model.disabled
-            ]
-                ++ fullWidth
+            List.concat
+                [ model.attrs
+                , [ model.label |> HtmlA.label
+                  , model.idFromString >> model.wrap |> onChange
+                  , HtmlA.disabled model.disabled
+                  ]
+                , fullWidth
+                ]
     in
     Html.node "mwc-select" allAttrs (items |> List.map (viewItem model))
 

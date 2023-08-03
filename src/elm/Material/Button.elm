@@ -37,7 +37,7 @@ viewWithAttrs type_ density label icon action extraAttrs =
                     []
 
                 Outlined ->
-                    [ HtmlA.attribute "outlined" "" ]
+                    [ HtmlA.outlined ]
 
                 Raised ->
                     [ HtmlA.attribute "raised" "" ]
