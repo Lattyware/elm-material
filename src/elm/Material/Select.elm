@@ -24,6 +24,13 @@ view model items =
             else
                 []
 
+        fixedMenuPosition =
+            if model.fixedPosition then
+                [ HtmlA.attribute "fixedMenuPosition" "" ]
+
+            else
+                []
+
         allAttrs =
             List.concat
                 [ model.attrs
@@ -31,6 +38,7 @@ view model items =
                   , model.idFromString >> model.wrap |> onChange
                   , HtmlA.disabled model.disabled
                   ]
+                , fixedMenuPosition
                 , fullWidth
                 ]
     in
@@ -47,6 +55,7 @@ type alias Model id msg =
     , wrap : Maybe id -> msg
     , disabled : Bool
     , fullWidth : Bool
+    , fixedPosition : Bool
     , attrs : List (Html.Attribute msg)
     }
 
