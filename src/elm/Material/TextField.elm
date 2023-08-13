@@ -1,5 +1,6 @@
 module Material.TextField exposing
     ( Type(..)
+    , onKeyDown
     , view
     , viewWithAttrs
     , viewWithFocus
@@ -46,14 +47,15 @@ viewWithFocus label t value action onFocus onBlur =
 viewWithReturn : String -> Type -> String -> Maybe (String -> msg) -> msg -> msg -> Html msg
 viewWithReturn label t value action onReturn noOp =
     let
-        onKeyPress k =
-            if k == 13 then
-                onReturn
+        onKeyPress pressedKey =
+            case pressedKey of
+                "Enter" ->
+                    onReturn
 
-            else
-                noOp
+                _ ->
+                    noOp
     in
-    viewWithAttrs label t value action [ HtmlE.keyCode |> Json.map onKeyPress |> HtmlE.on "keydown" ]
+    viewWithAttrs label t value action [ onKeyDown onKeyPress ]
 
 
 viewWithAttrs : String -> Type -> String -> Maybe (String -> msg) -> List (Html.Attribute msg) -> Html msg
@@ -75,6 +77,11 @@ viewWithAttrs label t value action attrs =
             ]
     in
     Html.node "mwc-textfield" (allAttrs ++ attrs) []
+
+
+onKeyDown : (String -> msg) -> Html.Attribute msg
+onKeyDown onKeyPress =
+    Json.field "key" Json.string |> Json.map onKeyPress |> HtmlE.on "keydown"
 
 
 
