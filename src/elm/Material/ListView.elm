@@ -1,5 +1,6 @@
 module Material.ListView exposing
     ( Action(..)
+    , IconSize(..)
     , action
     , interactive
     , view
@@ -28,6 +29,14 @@ type Action msg
     | Button (Maybe msg)
 
 
+type IconSize
+    = Icon
+    | Medium
+    | Large
+    | Control
+    | Avatar
+
+
 {-| A list item that is only sometimes enabled.
 -}
 interactive : msg -> Bool -> Action msg
@@ -48,11 +57,28 @@ action =
 
 {-| An item within a list.
 -}
-viewItem : Action msg -> Maybe (Html msg) -> Maybe (List (Html msg)) -> Maybe (List (Html msg)) -> List (Html msg) -> Html msg
+viewItem : Action msg -> Maybe ( IconSize, Html msg ) -> Maybe (List (Html msg)) -> Maybe (List (Html msg)) -> List (Html msg) -> Html msg
 viewItem action_ icon secondary meta children =
     let
+        iconSizeToString iconSize =
+            case iconSize of
+                Icon ->
+                    "icon"
+
+                Medium ->
+                    "medium"
+
+                Large ->
+                    "large"
+
+                Control ->
+                    "control"
+
+                Avatar ->
+                    "avatar"
+
         ( optionalAttrs, optionalSlots ) =
-            [ icon |> Maybe.map (\i -> ( HtmlA.attribute "graphic" "medium", Html.span [ HtmlA.slot "graphic" ] [ i ] ))
+            [ icon |> Maybe.map (\( s, i ) -> ( s |> iconSizeToString |> HtmlA.attribute "graphic", Html.span [ HtmlA.slot "graphic" ] [ i ] ))
             , meta |> Maybe.map (\m -> ( True |> Json.bool |> HtmlA.property "hasMeta", Html.span [ HtmlA.slot "meta" ] m ))
             , secondary |> Maybe.map (\s -> ( True |> Json.bool |> HtmlA.property "twoline", Html.span [ HtmlA.slot "secondary" ] s ))
             ]

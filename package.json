@@ -36,7 +36,7 @@
     "@material/mwc-textfield": "^0.27.0"
   },
   "devDependencies": {
-    "prettier": "3.0.1",
+    "prettier": "3.0.2",
     "prettier-plugin-elm": "0.11.0",
     "sass": "^1.57.1"
   }
