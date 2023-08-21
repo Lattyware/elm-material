@@ -7,8 +7,8 @@ module Material.Tabs exposing
 import Html exposing (Html)
 import Html.Attributes as HtmlA
 import Html.Events as HtmlE
-import Json.Decode
-import Json.Encode
+import Json.Decode as JsonD
+import Json.Encode as JsonE
 import List.Extra as List
 import Material.Attributes as HtmlA
 
@@ -86,7 +86,7 @@ stackedA =
 
 activeIndex : Int -> Html.Attribute msg
 activeIndex =
-    Json.Encode.int >> HtmlA.property "activeIndex"
+    JsonE.int >> HtmlA.property "activeIndex"
 
 
 hasImageIcon : Html.Attribute msg
@@ -96,7 +96,7 @@ hasImageIcon =
 
 onActivated : (Int -> msg) -> Html.Attribute msg
 onActivated wrap =
-    Json.Decode.int
-        |> Json.Decode.map wrap
-        |> Json.Decode.at [ "target", "activeIndex" ]
+    JsonD.int
+        |> JsonD.map wrap
+        |> JsonD.at [ "target", "activeIndex" ]
         |> HtmlE.on "MDCTabBar:activated"

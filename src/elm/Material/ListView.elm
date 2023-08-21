@@ -10,7 +10,7 @@ module Material.ListView exposing
 import Html exposing (Html)
 import Html.Attributes as HtmlA
 import Html.Events as HtmlE
-import Json.Encode as Json
+import Json.Encode as JsonE
 import Material.Attributes as HtmlA
 
 
@@ -79,8 +79,8 @@ viewItem action_ icon secondary meta children =
 
         ( optionalAttrs, optionalSlots ) =
             [ icon |> Maybe.map (\( s, i ) -> ( s |> iconSizeToString |> HtmlA.attribute "graphic", Html.span [ HtmlA.slot "graphic" ] [ i ] ))
-            , meta |> Maybe.map (\m -> ( True |> Json.bool |> HtmlA.property "hasMeta", Html.span [ HtmlA.slot "meta" ] m ))
-            , secondary |> Maybe.map (\s -> ( True |> Json.bool |> HtmlA.property "twoline", Html.span [ HtmlA.slot "secondary" ] s ))
+            , meta |> Maybe.map (\m -> ( True |> JsonE.bool |> HtmlA.property "hasMeta", Html.span [ HtmlA.slot "meta" ] m ))
+            , secondary |> Maybe.map (\s -> ( True |> JsonE.bool |> HtmlA.property "twoline", Html.span [ HtmlA.slot "secondary" ] s ))
             ]
                 |> List.filterMap identity
                 |> List.unzip
@@ -97,7 +97,7 @@ viewItem action_ icon secondary meta children =
                     ( a, [] )
 
                 None ->
-                    ( identity, [ True |> Json.bool |> HtmlA.property "noninteractive" ] )
+                    ( identity, [ True |> JsonE.bool |> HtmlA.property "noninteractive" ] )
 
         attrs =
             List.concat [ optionalAttrs, actionAttr ]

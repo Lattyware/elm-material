@@ -6,8 +6,8 @@ module Material.Slider exposing
 import Html exposing (Html)
 import Html.Attributes as HtmlA
 import Html.Events as HtmlE
-import Json.Decode
-import Json.Encode as Json
+import Json.Decode as JsonD
+import Json.Encode as JsonE
 
 
 type alias Model msg =
@@ -32,49 +32,50 @@ view model =
                     HtmlA.disabled True
 
         attrs =
-            [ min model.min
-            , max model.max
-            , step model.step
-            , value model.value
-            , markers
-            , pin
-            , action
-            ]
-                ++ model.attrs
+            min model.min
+                :: max model.max
+                :: step model.step
+                :: value model.value
+                :: markers
+                :: pin
+                :: action
+                :: model.attrs
     in
     Html.node "mwc-slider" attrs []
 
 
 step : Int -> Html.Attribute msg
 step =
-    Json.int >> HtmlA.property "step"
+    JsonE.int >> HtmlA.property "step"
 
 
 min : Int -> Html.Attribute msg
 min =
-    Json.int >> HtmlA.property "min"
+    JsonE.int >> HtmlA.property "min"
 
 
 max : Int -> Html.Attribute msg
 max =
-    Json.int >> HtmlA.property "max"
+    JsonE.int >> HtmlA.property "max"
 
 
 markers : Html.Attribute msg
 markers =
-    True |> Json.bool |> HtmlA.property "markers"
+    True |> JsonE.bool |> HtmlA.property "markers"
 
 
 pin : Html.Attribute msg
 pin =
-    True |> Json.bool |> HtmlA.property "pin"
+    True |> JsonE.bool |> HtmlA.property "pin"
 
 
 value : Int -> Html.Attribute msg
 value =
-    Json.int >> HtmlA.property "value"
+    JsonE.int >> HtmlA.property "value"
 
 
 onChange : (Int -> msg) -> Html.Attribute msg
 onChange wrap =
-    Json.Decode.at [ "target", "value" ] Json.Decode.int |> Json.Decode.map wrap |> HtmlE.on "change"
+    JsonD.at [ "target", "value" ] JsonD.int
+        |> JsonD.map wrap
+        |> HtmlE.on "change"

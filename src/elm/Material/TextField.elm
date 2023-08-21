@@ -10,7 +10,7 @@ module Material.TextField exposing
 import Html exposing (Html)
 import Html.Attributes as HtmlA
 import Html.Events as HtmlE
-import Json.Decode as Json
+import Json.Decode as JsonD
 import Material.Attributes as HtmlA
 
 
@@ -81,7 +81,7 @@ viewWithAttrs label t value action attrs =
 
 onKeyDown : (String -> msg) -> Html.Attribute msg
 onKeyDown onKeyPress =
-    Json.field "key" Json.string |> Json.map onKeyPress |> HtmlE.on "keydown"
+    JsonD.field "key" JsonD.string |> JsonD.map onKeyPress |> HtmlE.on "keydown"
 
 
 

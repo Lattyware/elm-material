@@ -6,7 +6,7 @@ module Material.Switch exposing
 import Html exposing (Html)
 import Html.Attributes as HtmlA
 import Html.Events as HtmlE
-import Json.Decode as Json
+import Json.Decode as JsonD
 
 
 view : Html msg -> Bool -> Maybe (Bool -> msg) -> Html msg
@@ -33,4 +33,7 @@ viewWithAttrs label checked action attrs =
 
 onCheckNoPropagation : (Bool -> msg) -> Html.Attribute msg
 onCheckNoPropagation msg =
-    HtmlE.stopPropagationOn "check" (Json.at [ "target", "checked" ] Json.bool |> Json.map (\c -> ( msg c, True )))
+    HtmlE.stopPropagationOn "check"
+        (JsonD.at [ "target", "checked" ] JsonD.bool
+            |> JsonD.map (\c -> ( msg c, True ))
+        )

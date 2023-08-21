@@ -8,8 +8,8 @@ module Material.Menu exposing
 import Html exposing (Html)
 import Html.Attributes as HtmlA
 import Html.Events as HtmlE
-import Json.Decode
-import Json.Encode as Json
+import Json.Decode as JsonD
+import Json.Encode as JsonE
 
 
 {-| The corner of the anchor element the menu should position itself at.
@@ -87,13 +87,13 @@ view onClose state corner menuCorner anchor menuItems =
     Html.div [ HtmlA.class "menu-anchor" ]
         [ anchor
         , Html.node "mwc-menu"
-            [ True |> Json.bool |> HtmlA.property "activatable"
-            , open |> Json.bool |> HtmlA.property "open"
+            [ True |> JsonE.bool |> HtmlA.property "activatable"
+            , open |> JsonE.bool |> HtmlA.property "open"
             , stringCorner |> HtmlA.attribute "corner"
             , stringMenuCorner |> HtmlA.attribute "menuCorner"
-            , True |> Json.bool |> HtmlA.property "fullwidth"
+            , True |> JsonE.bool |> HtmlA.property "fullwidth"
             , HtmlA.class "menu"
-            , onClose |> Json.Decode.succeed |> HtmlE.on "closing"
+            , onClose |> JsonD.succeed |> HtmlE.on "closing"
             ]
             menuItems
         ]

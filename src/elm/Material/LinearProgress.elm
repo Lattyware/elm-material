@@ -5,7 +5,7 @@ module Material.LinearProgress exposing
 
 import Html exposing (Html)
 import Html.Attributes as HtmlA
-import Json.Encode as Json
+import Json.Encode as JsonE
 
 
 {-| What progress to display.
@@ -35,10 +35,10 @@ progress : Progress -> Html.Attribute msg
 progress p =
     case p of
         Indeterminate ->
-            True |> Json.bool |> HtmlA.property "indeterminate"
+            True |> JsonE.bool |> HtmlA.property "indeterminate"
 
         Progress float ->
-            float |> Json.float |> HtmlA.property "progress"
+            float |> JsonE.float |> HtmlA.property "progress"
 
         Closed ->
-            True |> Json.bool |> HtmlA.property "closed"
+            True |> JsonE.bool |> HtmlA.property "closed"

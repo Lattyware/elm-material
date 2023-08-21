@@ -7,8 +7,8 @@ module Material.Select exposing
 import Html exposing (Html)
 import Html.Attributes as HtmlA
 import Html.Events as HtmlE
-import Json.Decode as Json
-import Json.Encode
+import Json.Decode as JsonD
+import Json.Encode as JsonE
 import Material.Attributes as HtmlA
 
 
@@ -82,8 +82,8 @@ viewItem { idToString, selected } { id, icon, primary, secondary, meta } =
     let
         ( optionalAttrs, optionalSlots ) =
             [ icon |> Maybe.map (\i -> ( HtmlA.attribute "graphic" "large", Html.span [ HtmlA.slot "graphic" ] [ i ] ))
-            , meta |> Maybe.map (\m -> ( True |> Json.Encode.bool |> HtmlA.property "hasMeta", Html.span [ HtmlA.slot "meta" ] [ m ] ))
-            , secondary |> Maybe.map (\s -> ( True |> Json.Encode.bool |> HtmlA.property "twoline", Html.span [ HtmlA.slot "secondary" ] s ))
+            , meta |> Maybe.map (\m -> ( True |> JsonE.bool |> HtmlA.property "hasMeta", Html.span [ HtmlA.slot "meta" ] [ m ] ))
+            , secondary |> Maybe.map (\s -> ( True |> JsonE.bool |> HtmlA.property "twoline", Html.span [ HtmlA.slot "secondary" ] s ))
             ]
                 |> List.filterMap identity
                 |> List.unzip
@@ -101,4 +101,6 @@ viewItem { idToString, selected } { id, icon, primary, secondary, meta } =
 -}
 onChange : (String -> msg) -> Html.Attribute msg
 onChange wrap =
-    Json.at [ "target", "value" ] Json.string |> Json.map wrap |> HtmlE.on "change"
+    JsonD.at [ "target", "value" ] JsonD.string
+        |> JsonD.map wrap
+        |> HtmlE.on "change"
