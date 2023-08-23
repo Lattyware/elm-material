@@ -31,13 +31,21 @@ view model items =
             else
                 []
 
+        ( onChangeAttr, disabled ) =
+            case model.wrap of
+                Just wrap ->
+                    ( [ model.idFromString >> wrap |> onChange ], False )
+
+                Nothing ->
+                    ( [], True )
+
         allAttrs =
             List.concat
                 [ model.attrs
                 , [ model.label |> HtmlA.label
-                  , model.idFromString >> model.wrap |> onChange
-                  , HtmlA.disabled model.disabled
+                  , HtmlA.disabled (model.disabled || disabled)
                   ]
+                , onChangeAttr
                 , fixedMenuPosition
                 , fullWidth
                 ]
@@ -52,7 +60,7 @@ type alias Model id msg =
     , idToString : id -> String
     , idFromString : String -> Maybe id
     , selected : Maybe id
-    , wrap : Maybe id -> msg
+    , wrap : Maybe (Maybe id -> msg)
     , disabled : Bool
     , fullWidth : Bool
     , fixedPosition : Bool
@@ -80,19 +88,37 @@ type alias ItemModel id msg =
 viewItem : Model id msg -> ItemModel id msg -> Html msg
 viewItem { idToString, selected } { id, icon, primary, secondary, meta } =
     let
+        iconAttrAndSlot i =
+            ( HtmlA.attribute "graphic" "large"
+            , Html.span [ HtmlA.slot "graphic" ] [ i ]
+            )
+
+        metaAttrAndSlot m =
+            ( True |> JsonE.bool |> HtmlA.property "hasMeta"
+            , Html.span [ HtmlA.slot "meta" ] [ m ]
+            )
+
+        secondaryAttrAndSlot s =
+            ( True |> JsonE.bool |> HtmlA.property "twoline"
+            , Html.span [ HtmlA.slot "secondary" ] s
+            )
+
         ( optionalAttrs, optionalSlots ) =
-            [ icon |> Maybe.map (\i -> ( HtmlA.attribute "graphic" "large", Html.span [ HtmlA.slot "graphic" ] [ i ] ))
-            , meta |> Maybe.map (\m -> ( True |> JsonE.bool |> HtmlA.property "hasMeta", Html.span [ HtmlA.slot "meta" ] [ m ] ))
-            , secondary |> Maybe.map (\s -> ( True |> JsonE.bool |> HtmlA.property "twoline", Html.span [ HtmlA.slot "secondary" ] s ))
+            [ icon |> Maybe.map iconAttrAndSlot
+            , meta |> Maybe.map metaAttrAndSlot
+            , secondary |> Maybe.map secondaryAttrAndSlot
             ]
                 |> List.filterMap identity
                 |> List.unzip
 
         attrs =
-            List.concat [ optionalAttrs, [ id |> idToString |> HtmlA.value, selected == Just id |> HtmlA.selected ] ]
+            (id |> idToString |> HtmlA.value)
+                :: (selected == Just id |> HtmlA.selected)
+                :: optionalAttrs
 
         slots =
-            List.concat [ primary, optionalSlots ] |> List.intersperse (Html.text " ")
+            List.concat [ primary, optionalSlots ]
+                |> List.intersperse (Html.text " ")
     in
     Html.node "mwc-list-item" attrs slots
 

@@ -1,5 +1,6 @@
 module Material.Attributes exposing
-    ( fullWidth
+    ( charCounter
+    , fullWidth
     , label
     , outlined
     , slot
@@ -27,3 +28,8 @@ fullWidth =
 outlined : Html.Attribute msg
 outlined =
     HtmlA.attribute "outlined" ""
+
+
+charCounter : Html.Attribute msg
+charCounter =
+    HtmlA.attribute "charCounter" ""
