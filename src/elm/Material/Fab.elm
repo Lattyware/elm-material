@@ -1,42 +1,179 @@
 module Material.Fab exposing
-    ( Type(..)
-    , view
+    ( Fab, view
+    , small, medium, large
+    , extended, iconlessExtended
+    , lowered
+    , surface, primary, secondary, tertiary
+    , attrs
     )
+
+{-| The Floating action button represents the most important action on a
+screen. It puts key actions within reach.
+
+
+# Core
+
+@docs Fab, view
+
+
+# FAB Variants
+
+
+## Sizes
+
+@docs small, medium, large
+
+
+## Extended
+
+@docs extended, iconlessExtended
+
+
+# Optional Customisation
+
+
+## Styles
+
+@docs lowered
+
+
+## Colors
+
+@docs surface, primary, secondary, tertiary
+
+
+## Other
+
+@docs attrs
+
+-}
 
 import Html exposing (Html)
 import Html.Attributes as HtmlA
 import Html.Events as HtmlE
-import Material.Attributes as HtmlA
+import Material.Util as Util
 
 
-type Type
-    = Normal
-    | Extended String
-    | Mini
+type alias Pipeline msg =
+    { icon : Maybe (Html msg)
+    , lowered : Bool
+    , variant : String
+    , attrs : List (Html.Attribute msg)
+    }
 
 
-view : Type -> String -> Html msg -> Maybe msg -> List (Html.Attribute msg) -> Html msg
-view type_ title icon action attrs =
+{-| A floating action button definition, which can be turned into HTML with
+[`view`](#view).
+-}
+type Fab msg
+    = Fab (Pipeline msg)
+
+
+init : Maybe (Html msg) -> String -> Maybe String -> Maybe String -> Maybe msg -> Fab msg
+init icon size label description action =
     let
-        style =
-            case type_ of
-                Mini ->
-                    [ HtmlA.attribute "mini" "" ]
-
-                Extended text ->
-                    [ text |> HtmlA.label, HtmlA.attribute "extended" "" ]
-
-                _ ->
-                    []
-
-        onClick =
-            case action of
-                Just msg ->
-                    msg |> HtmlE.onClick
-
-                Nothing ->
-                    HtmlA.disabled True
+        initialAttrs =
+            List.concat
+                [ Util.asAttr "label" label
+                , Util.asAttr "aria-label" description
+                , [ HtmlA.attribute "size" size
+                  , Util.actionAttr HtmlE.onClick action
+                  ]
+                ]
     in
-    Html.node "mwc-fab"
-        (List.concat [ [ title |> HtmlA.title, onClick ], style, attrs ])
-        [ Html.span [ HtmlA.slot "icon" ] [ icon ] ]
+    Pipeline icon False "surface" initialAttrs |> Fab
+
+
+{-| Turn a [`Fab` definition](#Fab) into HTML.
+-}
+view : Fab msg -> Html msg
+view (Fab pipeline) =
+    Html.node "md-fab"
+        (List.concat
+            [ pipeline.attrs
+            , pipeline.lowered |> Util.boolAttr "lowered"
+            , [ HtmlA.attribute "variant" pipeline.variant ]
+            ]
+        )
+        (pipeline.icon |> Util.asSlot "icon")
+
+
+{-| A small FAB. Takes the icon and a descriptive string explaining what the
+button does.
+-}
+small : Html msg -> String -> Maybe msg -> Fab msg
+small givenIcon description =
+    init (Just givenIcon) "small" Nothing (Just description)
+
+
+{-| A small FAB. Takes the icon and a descriptive string explaining what the
+button does.
+-}
+medium : Html msg -> String -> Maybe msg -> Fab msg
+medium givenIcon description =
+    init (Just givenIcon) "medium" Nothing (Just description)
+
+
+{-| A small FAB. Takes the icon and a descriptive string explaining what the
+button does.
+-}
+large : Html msg -> String -> Maybe msg -> Fab msg
+large givenIcon description =
+    init (Just givenIcon) "large" Nothing (Just description)
+
+
+{-| A FAB extended with a label for additional emphasis. Takes the icon and a
+label.
+-}
+extended : Html msg -> String -> Maybe msg -> Fab msg
+extended givenIcon label =
+    init (Just givenIcon) "extended" (Just label) Nothing
+
+
+{-| An extended FAB can omit an icon. Takes the label.
+-}
+iconlessExtended : String -> Maybe msg -> Fab msg
+iconlessExtended label =
+    init Nothing "extended" (Just label) Nothing
+
+
+{-| Set if the FAB should be displayed at a lower elevation.
+-}
+lowered : Bool -> Fab msg -> Fab msg
+lowered newLowered (Fab pipeline) =
+    Fab { pipeline | lowered = newLowered }
+
+
+{-| Set the FAB to display with the surface colour (the default).
+-}
+surface : Fab msg -> Fab msg
+surface (Fab pipeline) =
+    Fab { pipeline | variant = "surface" }
+
+
+{-| Set the FAB to display with the primary colour.
+-}
+primary : Fab msg -> Fab msg
+primary (Fab pipeline) =
+    Fab { pipeline | variant = "primary" }
+
+
+{-| Set the FAB to display with the secondary colour.
+-}
+secondary : Fab msg -> Fab msg
+secondary (Fab pipeline) =
+    Fab { pipeline | variant = "secondary" }
+
+
+{-| Set the FAB to display with the tertiary colour.
+-}
+tertiary : Fab msg -> Fab msg
+tertiary (Fab pipeline) =
+    Fab { pipeline | variant = "tertiary" }
+
+
+{-| Add custom attributes to the FAB.
+-}
+attrs : List (Html.Attribute msg) -> Fab msg -> Fab msg
+attrs newAttrs (Fab pipeline) =
+    Fab { pipeline | attrs = List.append pipeline.attrs newAttrs }

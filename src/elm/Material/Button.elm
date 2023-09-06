@@ -1,78 +1,172 @@
 module Material.Button exposing
-    ( Density(..)
-    , Type(..)
-    , view
-    , viewWithAttrs
+    ( Button, view
+    , elevated, filled, filledTonal, outlined, text
+    , button, link, replacedLink
+    , icon, attrs
     )
 
+{-| Buttons help people initiate actions, from sending an email, to sharing a
+document, to liking a post.
+
+
+# Core
+
+@docs Button, view
+
+
+# Button Variants
+
+@docs elevated, filled, filledTonal, outlined, text
+
+
+# Actions
+
+@docs button, link, replacedLink
+
+
+# Optional Customisation
+
+@docs icon, attrs
+
+-}
+
 import Html exposing (Html)
-import Html.Attributes as HtmlA
 import Html.Events as HtmlE
-import Material.Attributes as HtmlA
+import Material.Util as Util
 
 
-type Density
-    = Padded
-    | Dense
+type Action msg
+    = LinkAction String (Maybe String) (Maybe (String -> Maybe String -> msg))
+    | ButtonAction (Maybe msg)
 
 
-type Type
-    = Standard
-    | Outlined
-    | Raised
-    | Unelevated
+type alias Pipeline msg =
+    { node : String
+    , action : Action msg
+    , label : String
+    , icon : Maybe (Html msg)
+    , attrs : List (Html.Attribute msg)
+    }
 
 
-view : Type -> Density -> String -> Maybe (Html msg) -> Maybe msg -> Html msg
-view type_ density label icon action =
-    viewWithAttrs type_ density label icon action []
+{-| A button definition, which can be turned into HTML with [`view`](#view).
+-}
+type Button msg
+    = Button (Pipeline msg)
 
 
-viewWithAttrs : Type -> Density -> String -> Maybe (Html msg) -> Maybe msg -> List (Html.Attribute msg) -> Html msg
-viewWithAttrs type_ density label icon action extraAttrs =
+init : String -> String -> Button msg
+init node label =
+    Pipeline node (ButtonAction Nothing) label Nothing [] |> Button
+
+
+{-| Elevated buttons are essentially filled tonal buttons with a shadow.
+To prevent shadow creep, only use them when absolutely necessary, such as when
+the button requires visual separation from a patterned background.
+Takes a label
+-}
+elevated : String -> Button msg
+elevated =
+    init "md-elevated-button"
+
+
+{-| Filled buttons have the most visual impact after the FAB, and should be
+used for important, final actions that complete a flow, like Save, Join now,
+or Confirm.
+Takes a label.
+-}
+filled : String -> Button msg
+filled =
+    init "md-filled-button"
+
+
+{-| A filled tonal button is an alternative middle ground between filled and
+outlined buttons. They're useful in contexts where a lower-priority button
+requires slightly more emphasis than an outline would give, such as "Next" in
+an onboarding flow.
+Takes a label.
+-}
+filledTonal : String -> Button msg
+filledTonal =
+    init "md-filled-tonal-button"
+
+
+{-| Outlined buttons are medium-emphasis buttons. They contain actions that
+are important, but aren’t the primary action in an app.
+Takes a label.
+-}
+outlined : String -> Button msg
+outlined =
+    init "md-outlined-button"
+
+
+{-| Text buttons are used for the lowest priority actions, especially when
+presenting multiple options.
+Takes a label.
+-}
+text : String -> Button msg
+text =
+    init "md-text-button"
+
+
+{-| Give the button an action as a simple click button.
+If the action is Nothing, the icon button is disabled.
+-}
+button : Maybe msg -> Button msg -> Button msg
+button action (Button pipeline) =
+    Button { pipeline | action = ButtonAction action }
+
+
+{-| Give the button an action as a link.
+Links can't be disabled.
+Note that web components don't have links that feed into Elm, so links will
+force a page load. If you don't want this, see [`replacedLink`](#replacedLink)
+for a workaround.
+Takes the link url, and the target.
+-}
+link : String -> Maybe String -> Button msg -> Button msg
+link href target (Button pipeline) =
+    Button { pipeline | action = LinkAction href target Nothing }
+
+
+{-| Give the button an action as a link.
+Links can't be disabled.
+This replaces the normal click action with an Elm one, half button, half link.
+Takes the link url, and the target.
+-}
+replacedLink : (String -> Maybe String -> msg) -> String -> Maybe String -> Button msg -> Button msg
+replacedLink pushUrl href target (Button pipeline) =
+    Button { pipeline | action = LinkAction href target (Just pushUrl) }
+
+
+{-| Set an icon for a button to help communicate the button's action and help
+draw attention.
+-}
+icon : Html msg -> Button msg -> Button msg
+icon newIcon (Button pipeline) =
+    Button { pipeline | icon = Just newIcon }
+
+
+{-| Add custom attributes to the button.
+-}
+attrs : List (Html.Attribute msg) -> Button msg -> Button msg
+attrs newAttrs (Button pipeline) =
+    Button { pipeline | attrs = List.append pipeline.attrs newAttrs }
+
+
+{-| Turn a [`Button` definition](#Button) into HTML.
+-}
+view : Button msg -> Html msg
+view (Button pipeline) =
     let
-        typeAttr =
-            case type_ of
-                Standard ->
-                    []
+        actionAttrs =
+            case pipeline.action of
+                LinkAction href target pushUrl ->
+                    Util.replacedLink href target pushUrl
 
-                Outlined ->
-                    [ HtmlA.outlined ]
-
-                Raised ->
-                    [ HtmlA.attribute "raised" "" ]
-
-                Unelevated ->
-                    [ HtmlA.attribute "unelevated" "" ]
-
-        densityAttr =
-            case density of
-                Padded ->
-                    []
-
-                Dense ->
-                    [ HtmlA.attribute "dense" "" ]
-
-        actionAttr =
-            case action of
-                Just msg ->
-                    msg |> HtmlE.onClick
-
-                Nothing ->
-                    HtmlA.disabled True
-
-        allAttrs =
-            List.concat
-                [ [ label |> HtmlA.label
-                  , label |> HtmlA.title
-                  , actionAttr
-                  ]
-                , typeAttr
-                , densityAttr
-                , extraAttrs
-                ]
-
-        iconSlot i =
-            [ Html.span [ HtmlA.slot "icon" ] [ i ] ]
+                ButtonAction action ->
+                    [ Util.actionAttr HtmlE.onClick action ]
     in
-    Html.node "mwc-button" allAttrs (icon |> Maybe.map iconSlot |> Maybe.withDefault [])
+    Html.node pipeline.node
+        (List.append actionAttrs pipeline.attrs)
+        (Html.text pipeline.label :: (pipeline.icon |> Util.asSlot "icon"))
