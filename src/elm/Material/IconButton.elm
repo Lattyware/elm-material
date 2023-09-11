@@ -191,7 +191,9 @@ view (IconButton pipeline) =
     Html.node pipeline.node
         (List.concat
             [ pipeline.attrs
-            , [ HtmlA.attribute "aria-label" pipeline.description ]
+            , [ HtmlA.attribute "aria-label" pipeline.description
+              , HtmlA.title pipeline.description
+              ]
             , actionAttrs
             ]
         )

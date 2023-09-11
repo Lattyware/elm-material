@@ -316,9 +316,9 @@ error givenError (Select pipeline) =
 
 {-| Indicates the field is required and giving no value isn't correct.
 -}
-required : Select msg -> Select msg
-required (Select pipeline) =
-    Select { pipeline | required = True }
+required : Bool -> Select msg -> Select msg
+required isRequired (Select pipeline) =
+    Select { pipeline | required = isRequired }
 
 
 {-| Add custom attributes to the select.

@@ -242,9 +242,9 @@ error givenError (TextField pipeline) =
 
 {-| Indicates the field is required and giving no value isn't correct.
 -}
-required : TextField msg -> TextField msg
-required (TextField pipeline) =
-    TextField { pipeline | attrs = HtmlA.required True :: pipeline.attrs }
+required : Bool -> TextField msg -> TextField msg
+required isRequired (TextField pipeline) =
+    TextField { pipeline | attrs = HtmlA.required isRequired :: pipeline.attrs }
 
 
 {-| An action to do whenever a key is pressed in the field.

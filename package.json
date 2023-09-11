@@ -20,7 +20,7 @@
     "dist/*"
   ],
   "dependencies": {
-    "@material/web": "github:material-components/material-web#main"
+    "@material/web": "1.0.0-pre.17"
   },
   "devDependencies": {
     "prettier": "3.0.3",
