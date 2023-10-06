@@ -55,7 +55,7 @@ import Material.Util as Util
 
 
 type alias Pipeline msg =
-    { icon : Maybe (Html msg)
+    { icon : Maybe (List (Html msg))
     , lowered : Bool
     , variant : String
     , attrs : List (Html.Attribute msg)
@@ -69,7 +69,7 @@ type Fab msg
     = Fab (Pipeline msg)
 
 
-init : Maybe (Html msg) -> String -> Maybe String -> Maybe String -> Maybe msg -> Fab msg
+init : Maybe (List (Html msg)) -> String -> Maybe String -> Maybe String -> Maybe msg -> Fab msg
 init icon size label description action =
     let
         initialAttrs =
@@ -101,7 +101,7 @@ view (Fab pipeline) =
 {-| A small FAB. Takes the icon and a descriptive string explaining what the
 button does.
 -}
-small : Html msg -> String -> Maybe msg -> Fab msg
+small : List (Html msg) -> String -> Maybe msg -> Fab msg
 small givenIcon description =
     init (Just givenIcon) "small" Nothing (Just description)
 
@@ -109,7 +109,7 @@ small givenIcon description =
 {-| A small FAB. Takes the icon and a descriptive string explaining what the
 button does.
 -}
-medium : Html msg -> String -> Maybe msg -> Fab msg
+medium : List (Html msg) -> String -> Maybe msg -> Fab msg
 medium givenIcon description =
     init (Just givenIcon) "medium" Nothing (Just description)
 
@@ -117,7 +117,7 @@ medium givenIcon description =
 {-| A small FAB. Takes the icon and a descriptive string explaining what the
 button does.
 -}
-large : Html msg -> String -> Maybe msg -> Fab msg
+large : List (Html msg) -> String -> Maybe msg -> Fab msg
 large givenIcon description =
     init (Just givenIcon) "large" Nothing (Just description)
 
@@ -125,7 +125,7 @@ large givenIcon description =
 {-| A FAB extended with a label for additional emphasis. Takes the icon and a
 label.
 -}
-extended : Html msg -> String -> Maybe msg -> Fab msg
+extended : List (Html msg) -> String -> Maybe msg -> Fab msg
 extended givenIcon label =
     init (Just givenIcon) "extended" (Just label) Nothing
 

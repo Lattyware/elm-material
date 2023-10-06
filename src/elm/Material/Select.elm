@@ -3,10 +3,10 @@ module Material.Select exposing
     , error, required, supportingText, leadingIcon, fixed
     , attrs
     , Option, option
-    , icon, avatar, image, video
-    , optionSupportingText
-    , trailingSupportingText, trailingIcon
+    , displayText
+    , start, overline, optionSupportingText, trailingSupportingText, end
     , optionAttrs
+    , trailingIcon
     )
 
 {-| Selects allow users to pick a value from a range of options.
@@ -30,20 +30,12 @@ module Material.Select exposing
 
 ## Optional Customisation
 
-
-### Start Parts
-
-@docs icon, avatar, image, video
+@docs displayText
 
 
-### Main parts.
+### Additional parts.
 
-@docs optionSupportingText
-
-
-### End Parts
-
-@docs trailingSupportingText, trailingIcon
+@docs start, overline, optionSupportingText, trailingSupportingText, end
 
 
 ### Other
@@ -56,29 +48,19 @@ import Html exposing (Html)
 import Html.Attributes as HtmlA
 import Json.Decode as JsonD
 import Material.Util as Util
-
-
-type Start msg
-    = NoStart
-    | StartSlot String (Html msg)
-
-
-type End msg
-    = NoEnd
-    | EndIcon (Html msg)
-    | EndText String
+import Material.Util.Item as Item
 
 
 type alias OptionPipeline msg =
-    { headline : String
-    , selected : Bool
+    { headline : List (Html msg)
+    , disabled : Bool
     , value : String
-    , supportingText : Maybe String
-    , multilineSupportingText : Bool
-    , start : Start msg
-    , end : End msg
-    , error : Maybe String
-    , required : Bool
+    , displayText : Maybe String
+    , overline : Maybe (List (Html msg))
+    , supportingText : Maybe (List (Html msg))
+    , trailingSupportingText : Maybe (List (Html msg))
+    , start : Maybe (List (Html msg))
+    , end : Maybe (List (Html msg))
     , attrs : List (Html.Attribute msg)
     }
 
@@ -89,134 +71,83 @@ type Option msg
 
 {-| Create an option with the given label and value.
 -}
-option : String -> Bool -> String -> Option msg
-option headline selected value =
-    OptionPipeline headline
-        selected
+option : List (Html msg) -> String -> Option msg
+option headline value =
+    OptionPipeline
+        headline
+        False
         value
         Nothing
-        False
-        NoStart
-        NoEnd
         Nothing
-        False
+        Nothing
+        Nothing
+        Nothing
+        Nothing
         []
         |> Option
 
 
-{-| Add supporting text to the item.
-Takes the text and if the text can go multiline or will be cut off.
+{-| The text that will be displayed when the option is selected, defaults to the text
+from the headline element.
 -}
-optionSupportingText : String -> Bool -> Option msg -> Option msg
-optionSupportingText text multiline (Option pipeline) =
-    Option
-        { pipeline
-            | supportingText = Just text
-            , multilineSupportingText = multiline
-        }
+displayText : String -> Option msg -> Option msg
+displayText text (Option pipeline) =
+    { pipeline | displayText = Just text } |> Option
 
 
-{-| Add an icon to the item. Replaces any other starting element.
+{-| Add supporting text to the option.
 -}
-icon : Html msg -> Option msg -> Option msg
-icon givenSlot (Option pipeline) =
-    Option { pipeline | start = StartSlot "icon" givenSlot }
+optionSupportingText : List (Html msg) -> Option msg -> Option msg
+optionSupportingText supportingTextElement (Option pipeline) =
+    pipeline |> Item.supportingText supportingTextElement |> Option
 
 
-{-| Add an icon to the item. Replaces any other starting element.
+{-| Add text that displays above the headline for the option.
 -}
-avatar : Html msg -> Option msg -> Option msg
-avatar givenSlot (Option pipeline) =
-    Option { pipeline | start = StartSlot "avatar" givenSlot }
+overline : List (Html msg) -> Option msg -> Option msg
+overline overlineElement (Option pipeline) =
+    pipeline |> Item.overline overlineElement |> Option
 
 
-{-| Add an image to the item. Replaces any other starting element.
+{-| Add trailing supporting text to the iteoptionm. Replaces any other trailing element.
 -}
-image : Html msg -> Option msg -> Option msg
-image givenSlot (Option pipeline) =
-    Option { pipeline | start = StartSlot "image" givenSlot }
+trailingSupportingText : List (Html msg) -> Option msg -> Option msg
+trailingSupportingText trailingSupportingTextElement (Option pipeline) =
+    pipeline |> Item.trailingSupportingText trailingSupportingTextElement |> Option
 
 
-{-| Add a video to the item. Replaces any other starting element.
+{-| Add an element that displays at the start of the option.
 -}
-video : Html msg -> Option msg -> Option msg
-video givenSlot (Option pipeline) =
-    Option { pipeline | start = StartSlot "video" givenSlot }
+start : List (Html msg) -> Option msg -> Option msg
+start startElement (Option pipeline) =
+    pipeline |> Item.start startElement |> Option
 
 
-{-| Add trailing supporting text to the item. Replaces any other trailing element.
+{-| Add an element that displays at the end of the option.
 -}
-trailingSupportingText : String -> Option msg -> Option msg
-trailingSupportingText text (Option pipeline) =
-    Option { pipeline | end = EndText text }
+end : List (Html msg) -> Option msg -> Option msg
+end endElement (Option pipeline) =
+    pipeline |> Item.end endElement |> Option
 
 
-{-| Add a trailing icon to the item. Replaces any other trailing element.
--}
-trailingIcon : Html msg -> Option msg -> Option msg
-trailingIcon givenIcon (Option pipeline) =
-    Option { pipeline | end = EndIcon givenIcon }
-
-
-{-| Add custom attributes to the item.
+{-| Add custom attributes to the option.
 -}
 optionAttrs : List (Html.Attribute msg) -> Option msg -> Option msg
 optionAttrs newAttrs (Option pipeline) =
-    Option { pipeline | attrs = List.append pipeline.attrs newAttrs }
+    pipeline |> Item.attrs newAttrs |> Option
 
 
-internalViewOption : Option msg -> Html msg
-internalViewOption (Option pipeline) =
-    let
-        startContents =
-            case pipeline.start of
-                NoStart ->
-                    []
-
-                StartSlot variant slot ->
-                    [ Html.span
-                        [ HtmlA.attribute "slot" "start"
-                        , HtmlA.attribute "data-variant" variant
-                        ]
-                        [ slot ]
-                    ]
-
-        ( endContents, endAttr ) =
-            case pipeline.end of
-                NoEnd ->
-                    ( [], [] )
-
-                EndText text ->
-                    ( []
-                    , [ HtmlA.attribute "trailing-supporting-text" text ]
-                    )
-
-                EndIcon slot ->
-                    ( [ Html.span
-                            [ HtmlA.attribute "slot" "end"
-                            , HtmlA.attribute "data-variant" "icon"
-                            ]
-                            [ slot ]
-                      ]
-                    , []
-                    )
-
-        attrsForItem =
-            [ [ HtmlA.attribute "headline" pipeline.headline
-              , HtmlA.value pipeline.value
-              ]
-            , pipeline.selected |> Util.boolAttr "selected"
-            , pipeline.supportingText |> Util.asAttr "supporting-text"
-            , pipeline.multilineSupportingText |> Util.boolAttr "multi-line-supporting-text"
-            , endAttr
+internalViewOption : Maybe String -> Option msg -> Html msg
+internalViewOption selected (Option pipeline) =
+    Item.view "md-select-option"
+        (List.concat
+            [ [ HtmlA.attribute "value" pipeline.value ]
+            , (Just pipeline.value == selected) |> Util.boolAttr "selected"
+            , pipeline.displayText |> Util.asAttr "display-text"
             ]
-
-        contents =
-            [ startContents, endContents ]
-    in
-    Html.node "md-select-option"
-        (List.concat attrsForItem)
-        (List.concat contents)
+        )
+        []
+        pipeline
 
 
 type alias Pipeline msg =
@@ -228,9 +159,10 @@ type alias Pipeline msg =
     , menuFixed : Bool
     , required : Bool
     , supportingText : Maybe String
-    , multilineSupportingText : Bool
-    , leadingIcon : Maybe (Html msg)
+    , leadingIcon : Maybe (List (Html msg))
+    , trailingIcon : Maybe (List (Html msg))
     , error : Maybe String
+    , selected : Maybe String
     , attrs : List (Html.Attribute msg)
     }
 
@@ -243,8 +175,8 @@ type Select msg
 
 {-| A filled select.
 -}
-filled : String -> Maybe (String -> msg) -> List (Option msg) -> Select msg
-filled label action children =
+filled : String -> Maybe (String -> msg) -> Maybe String -> List (Option msg) -> Select msg
+filled label action selected children =
     Pipeline
         "md-filled-select"
         label
@@ -254,17 +186,18 @@ filled label action children =
         False
         False
         Nothing
-        False
         Nothing
         Nothing
+        Nothing
+        selected
         []
         |> Select
 
 
 {-| A filled select.
 -}
-outlined : String -> Maybe (String -> msg) -> List (Option msg) -> Select msg
-outlined label action children =
+outlined : String -> Maybe (String -> msg) -> Maybe String -> List (Option msg) -> Select msg
+outlined label action selected children =
     Pipeline
         "md-outlined-select"
         label
@@ -274,9 +207,10 @@ outlined label action children =
         False
         False
         Nothing
-        False
         Nothing
         Nothing
+        Nothing
+        selected
         []
         |> Select
 
@@ -291,20 +225,23 @@ fixed (Select pipeline) =
 {-| Add supporting text to the select.
 Takes the text and if the text can go multiline or will be cut off.
 -}
-supportingText : String -> Bool -> Select msg -> Select msg
-supportingText text multiline (Select pipeline) =
-    Select
-        { pipeline
-            | supportingText = Just text
-            , multilineSupportingText = multiline
-        }
+supportingText : String -> Select msg -> Select msg
+supportingText text (Select pipeline) =
+    Select { pipeline | supportingText = Just text }
 
 
 {-| Add a leading icon.
 -}
-leadingIcon : Html msg -> Select msg -> Select msg
+leadingIcon : List (Html msg) -> Select msg -> Select msg
 leadingIcon givenIcon (Select pipeline) =
     Select { pipeline | leadingIcon = Just givenIcon }
+
+
+{-| Add a trailing icon.
+-}
+trailingIcon : List (Html msg) -> Select msg -> Select msg
+trailingIcon givenIcon (Select pipeline) =
+    Select { pipeline | trailingIcon = Just givenIcon }
 
 
 {-| Display an error, displaces the supporting text if set.
@@ -343,23 +280,35 @@ view (Select pipeline) =
                 Nothing ->
                     []
 
+        positioning =
+            if pipeline.menuFixed then
+                "fixed"
+
+            else
+                "absolute"
+
         getValue =
             JsonD.at [ "target", "value" ] JsonD.string
 
         allAttrs =
             [ [ HtmlA.attribute "label" pipeline.label
               , Util.onActionAttr "change" getValue pipeline.action
+              , positioning |> HtmlA.attribute "menu-positioning"
               ]
             , pipeline.supportingText |> Util.asAttr "supporting-text"
-            , pipeline.multilineSupportingText |> Util.boolAttr "multi-line-supporting-text"
             , pipeline.quick |> Util.boolAttr "quick"
-            , pipeline.menuFixed |> Util.boolAttr "menu-fixed"
             , pipeline.required |> Util.boolAttr "required"
             , errorAttrs
             , pipeline.attrs
             ]
+
+        icons =
+            [ pipeline.leadingIcon |> Util.asSlot "leading-icon"
+            , pipeline.trailingIcon |> Util.asSlot "trailing-icon"
+            ]
+                |> List.concat
     in
     List.append
-        (Util.asSlot "leadingicon" pipeline.leadingIcon)
-        (pipeline.options |> List.map internalViewOption)
+        icons
+        (pipeline.options |> List.map (internalViewOption pipeline.selected))
         |> Html.node pipeline.node (List.concat allAttrs)

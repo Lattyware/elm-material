@@ -53,8 +53,8 @@ type alias Pipeline msg =
     , value : String
     , type_ : String
     , placeholder : Maybe String
-    , leadingIcon : Maybe (Html msg)
-    , trailingIcon : Maybe (Html msg)
+    , leadingIcon : Maybe (List (Html msg))
+    , trailingIcon : Maybe (List (Html msg))
     , prefixText : Maybe String
     , suffixText : Maybe String
     , supportingText : Maybe String
@@ -200,14 +200,14 @@ supportingText givenText (TextField pipeline) =
 
 {-| An icon shown before the field to give additional context for the value.
 -}
-leadingIcon : Html msg -> TextField msg -> TextField msg
+leadingIcon : List (Html msg) -> TextField msg -> TextField msg
 leadingIcon givenIcon (TextField pipeline) =
     TextField { pipeline | leadingIcon = Just givenIcon }
 
 
 {-| An icon shown after the field to give additional context for the value.
 -}
-trailingIcon : Html msg -> TextField msg -> TextField msg
+trailingIcon : List (Html msg) -> TextField msg -> TextField msg
 trailingIcon givenIcon (TextField pipeline) =
     TextField { pipeline | trailingIcon = Just givenIcon }
 
@@ -330,8 +330,8 @@ view (TextField pipeline) =
             ]
 
         allContents =
-            [ pipeline.leadingIcon |> Util.asSlot "leadingicon"
-            , pipeline.trailingIcon |> Util.asSlot "trailingicon"
+            [ pipeline.leadingIcon |> Util.asSlot "leading-icon"
+            , pipeline.trailingIcon |> Util.asSlot "trailing-icon"
             ]
     in
     Html.node pipeline.node (List.concat allAttrs) (List.concat allContents)

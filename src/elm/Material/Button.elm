@@ -31,20 +31,15 @@ document, to liking a post.
 -}
 
 import Html exposing (Html)
-import Html.Events as HtmlE
 import Material.Util as Util
-
-
-type Action msg
-    = LinkAction String (Maybe String) (Maybe (String -> Maybe String -> msg))
-    | ButtonAction (Maybe msg)
+import Material.Util.Action as Action exposing (Action)
 
 
 type alias Pipeline msg =
     { node : String
     , action : Action msg
     , label : String
-    , icon : Maybe (Html msg)
+    , icon : Maybe (List (Html msg))
     , attrs : List (Html.Attribute msg)
     }
 
@@ -57,7 +52,7 @@ type Button msg
 
 init : String -> String -> Button msg
 init node label =
-    Pipeline node (ButtonAction Nothing) label Nothing [] |> Button
+    Pipeline node (Action.Button Nothing) label Nothing [] |> Button
 
 
 {-| Elevated buttons are essentially filled tonal buttons with a shadow.
@@ -114,7 +109,7 @@ If the action is Nothing, the icon button is disabled.
 -}
 button : Maybe msg -> Button msg -> Button msg
 button action (Button pipeline) =
-    Button { pipeline | action = ButtonAction action }
+    Button { pipeline | action = Action.Button action }
 
 
 {-| Give the button an action as a link.
@@ -126,7 +121,7 @@ Takes the link url, and the target.
 -}
 link : String -> Maybe String -> Button msg -> Button msg
 link href target (Button pipeline) =
-    Button { pipeline | action = LinkAction href target Nothing }
+    Button { pipeline | action = Action.Link href target Nothing }
 
 
 {-| Give the button an action as a link.
@@ -136,13 +131,13 @@ Takes the link url, and the target.
 -}
 replacedLink : (String -> Maybe String -> msg) -> String -> Maybe String -> Button msg -> Button msg
 replacedLink pushUrl href target (Button pipeline) =
-    Button { pipeline | action = LinkAction href target (Just pushUrl) }
+    Button { pipeline | action = Action.Link href target (Just pushUrl) }
 
 
 {-| Set an icon for a button to help communicate the button's action and help
 draw attention.
 -}
-icon : Html msg -> Button msg -> Button msg
+icon : List (Html msg) -> Button msg -> Button msg
 icon newIcon (Button pipeline) =
     Button { pipeline | icon = Just newIcon }
 
@@ -158,15 +153,6 @@ attrs newAttrs (Button pipeline) =
 -}
 view : Button msg -> Html msg
 view (Button pipeline) =
-    let
-        actionAttrs =
-            case pipeline.action of
-                LinkAction href target pushUrl ->
-                    Util.replacedLink href target pushUrl
-
-                ButtonAction action ->
-                    [ Util.actionAttr HtmlE.onClick action ]
-    in
     Html.node pipeline.node
-        (List.append actionAttrs pipeline.attrs)
+        (List.append (Action.pipelineAttrs pipeline) pipeline.attrs)
         (Html.text pipeline.label :: (pipeline.icon |> Util.asSlot "icon"))

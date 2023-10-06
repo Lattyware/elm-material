@@ -1,30 +1,29 @@
 {
   "name": "elm-material",
   "version": "1.0.0",
-  "description": "A thin wrapper for material components web components.",
+  "description": "An elm wrapper for a library of web components that follows Material Design.",
   "author": "Gareth Latty <gareth@lattyware.co.uk>",
-  "license": "AGPL-3.0-or-later",
+  "license": "MIT",
   "repository": "github:Lattyware/elm-material",
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./dist/material.mjs",
-    "./_material.scss": "./dist/_material.scss"
+    ".": "./src/js/all.js",
+    "./button": "./src/js/button.js",
+    "./chips": "./src/js/chips.js",
+    "./fab": "./src/js/fab.js",
+    "./icon-button": "./src/js/icon-button.js",
+    "./list": "./src/js/list.js",
+    "./menu": "./src/js/menu.js",
+    "./select": "./src/js/select.js",
+    "./switch": "./src/js/switch.js",
+    "./text-field": "./src/js/text-field.js"
   },
-  "scripts": {
-    "build:ts": "npx tsc",
-    "build:scss": "cp -r src/scss/* dist/",
-    "build": "npm run build:ts && npm run build:scss"
-  },
-  "files": [
-    "dist/*"
-  ],
   "dependencies": {
-    "@material/web": "1.0.0-pre.17"
+    "@material/web": "1.0.0"
   },
   "devDependencies": {
     "prettier": "3.0.3",
-    "prettier-plugin-elm": "0.11.0",
-    "sass": "^1.57.1"
+    "prettier-plugin-elm": "0.11.0"
   }
 }

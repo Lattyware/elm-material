@@ -34,11 +34,11 @@ asAttr attribute maybeValue =
             []
 
 
-asSlot : String -> Maybe (Html msg) -> List (Html msg)
-asSlot slot maybeElement =
-    case maybeElement of
-        Just element ->
-            [ Html.div [ HtmlA.attribute "slot" slot ] [ element ] ]
+asSlot : String -> Maybe (List (Html msg)) -> List (Html msg)
+asSlot slot maybeContents =
+    case maybeContents of
+        Just contents ->
+            [ Html.div [ HtmlA.attribute "slot" slot ] contents ]
 
         Nothing ->
             []
