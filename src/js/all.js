@@ -1,5 +1,6 @@
 import "./button.js";
 import "./chips.js";
+import "./dialog.js";
 import "./fab.js";
 import "./icon-button.js";
 import "./list.js";
