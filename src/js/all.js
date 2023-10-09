@@ -5,6 +5,7 @@ import "./fab.js";
 import "./icon-button.js";
 import "./list.js";
 import "./menu.js";
+import "./progress.js";
 import "./select.js";
 import "./switch.js";
 import "./text-field.js";

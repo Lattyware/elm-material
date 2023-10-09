@@ -1,7 +1,7 @@
 module Material.Chips.Assist exposing
     ( Assist, chip, view
     , button, link, replacedLink
-    , elevated, attrs
+    , icon, elevated, attrs
     )
 
 {-| Assist chips represent smart or automated actions that can span multiple
@@ -20,7 +20,7 @@ apps, such as opening a calendar event from the home screen.
 
 # Optional Customisation
 
-@docs elevated, attrs
+@docs icon, elevated, attrs
 
 -}
 
@@ -86,6 +86,13 @@ Takes the link url, and the target.
 replacedLink : (String -> Maybe String -> msg) -> String -> Maybe String -> Assist msg -> Assist msg
 replacedLink pushUrl href target (Assist pipeline) =
     Assist { pipeline | action = Action.Link href target (Just pushUrl) }
+
+
+{-| Indicates the chip has an icon.
+-}
+icon : List (Html msg) -> Assist msg -> Assist msg
+icon iconElement (Assist pipeline) =
+    Assist { pipeline | icon = Just iconElement }
 
 
 {-| Display the chip as elevated and more important.
