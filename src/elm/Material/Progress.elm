@@ -1,6 +1,7 @@
 module Material.Progress exposing
     ( Progress, view
     , linear, circular
+    , value
     , attrs
     )
 
@@ -17,6 +18,8 @@ such as loading an app or submitting a form.
 
 @docs linear, circular
 
+@docs value
+
 
 ## Optional Customisation
 
@@ -26,8 +29,6 @@ such as loading an app or submitting a form.
 
 import Html exposing (Html)
 import Html.Attributes as HtmlA
-import Json.Decode as JsonD
-import Material.Util as Util
 
 
 type Type
