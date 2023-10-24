@@ -20,7 +20,7 @@
     "./text-field": "./src/js/text-field.js"
   },
   "dependencies": {
-    "@material/web": "1.0.0"
+    "@material/web": "1.0.1"
   },
   "devDependencies": {
     "prettier": "3.0.3",
